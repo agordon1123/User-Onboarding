@@ -63,8 +63,7 @@ const FormikLoginForm = withFormik({
 
     validationSchema: Yup.object().shape({
         name: Yup.string().required('Name is required'),
-        email: Yup.string().required('Email not valid')
-            .required('Email is required'),
+        email: Yup.string().email('Email is required').required('Email not valid'),
         password: Yup.string()
             .min(6, 'Password must be 6 characters or longer')
             .required('Password is required')
