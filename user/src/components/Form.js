@@ -9,52 +9,58 @@ function LoginForm ({ touched, errors, values, status }) {
         if(status) {
             setUser([...users, status])
         }
-    })
+    }, [status])
+    console.log(users)
 
     return (
         <div className='login-form'>
             <Form>
                 <div>
-                    {touched.name && errors.name && <p>{errors.name}</p>}
                     <Field
                         type='text'
                         name='name'
                         placeholder='Name'
                     />
+                    {touched.name && errors.name && <p className='error'>{errors.name}</p>}
                 </div>
                 
                 <div>
-                    {touched.email && errors.email && <p>{errors.email}</p>}
                     <Field
                         type='email'
                         name='email'
-                        placeholder='Email address'
-
+                        placeholder='Email address'                        
                     />
+                    {touched.email && errors.email && <p className='error'>{errors.email}</p>}
                 </div>
                 
                 <div>
-                    {touched.password && errors.password && <p>{errors.password}</p>}
                     <Field
                         type='password'
                         name='password'
                         placeholder='Password'
-
                     />
+                    {touched.password && errors.password && <p className='error'>{errors.password}</p>}
                 </div>
                 
                 <div>
-                    {touched.terms && errors.terms && <p>{errors.terms}</p>}
+                    <label className='terms'>
                     <Field
                         type='checkbox'
                         name='terms'
                         checked={values.terms}
-                     />
+                    />
                     <p>Agree to the terms</p>
+                    </label>
+                    {touched.terms && errors.terms && <p className='error'>{errors.terms}</p>}
                 </div>
 
                 <button type='submit'>Submit</button>
             </Form>
+            {users.map(user => {
+                return (
+                    <p>{user.name}, {user.email}</p>
+                )
+            })}
         </div>
     )
 }
@@ -72,8 +78,8 @@ const FormikLoginForm = withFormik({
     validationSchema: Yup.object().shape({
         name: Yup.string().required('Name is required'),
         email: Yup.string()
-            .email('Email not valid')
-            .required('Email is required'),
+            .email('Email is required')
+            .required('Email not valid'),
         password: Yup.string()
             .min(6, 'Password must be 6 characters or longer')
             .required('Password is required'),
@@ -82,19 +88,19 @@ const FormikLoginForm = withFormik({
         // .test('consent', 'Terms agreement is required', value => value === true)
     }),
 
-    handleSubmit(values, { resetForm, setErrors, setSubmitting }, { setUser } ) {
+    handleSubmit(values, { setStatus } ) {
         console.log(values)
         Axios.post('https://reqres.in/api/users/', values)
         .then(res => {
             console.log('res.data ', res.data)
-            resetForm();
-            setSubmitting(false);
-            // setUser(res.data)
+            setStatus(res.data)
+            // resetForm();
+            // setSubmitting(false);
             // console.log(users)
         })
         .catch(err => {
             console.log('err ', err)
-            setErrors();
+            // setErrors();
         })
     }
 
