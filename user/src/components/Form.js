@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { withFormik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import Axios from 'axios';
 
-const LoginForm = ({ touched, errors }) => {
+function LoginForm ({ touched, errors, values, status }) {
+    const [users, setUser] = useState([])
+    useEffect(() => {
+        if(status) {
+            setUser([...users, status])
+        }
+    })
+
     return (
         <div className='login-form'>
             <Form>
@@ -37,10 +44,11 @@ const LoginForm = ({ touched, errors }) => {
                 </div>
                 
                 <div>
+                    {touched.terms && errors.terms && <p>{errors.terms}</p>}
                     <Field
                         type='checkbox'
                         name='terms'
-                        // check={values.terms}
+                        checked={values.terms}
                      />
                     <p>Agree to the terms</p>
                 </div>
@@ -63,15 +71,31 @@ const FormikLoginForm = withFormik({
 
     validationSchema: Yup.object().shape({
         name: Yup.string().required('Name is required'),
-        email: Yup.string().email('Email is required').required('Email not valid'),
+        email: Yup.string()
+            .email('Email not valid')
+            .required('Email is required'),
         password: Yup.string()
             .min(6, 'Password must be 6 characters or longer')
-            .required('Password is required')
-        // terms: Yup.
+            .required('Password is required'),
+        terms: Yup.bool()
+        .oneOf([true], 'Terms agreement is required')
+        // .test('consent', 'Terms agreement is required', value => value === true)
     }),
 
-    handleSubmit(values) {
+    handleSubmit(values, { resetForm, setErrors, setSubmitting }, { setUser } ) {
         console.log(values)
+        Axios.post('https://reqres.in/api/users/', values)
+        .then(res => {
+            console.log('res.data ', res.data)
+            resetForm();
+            setSubmitting(false);
+            // setUser(res.data)
+            // console.log(users)
+        })
+        .catch(err => {
+            console.log('err ', err)
+            setErrors();
+        })
     }
 
 })(LoginForm);
