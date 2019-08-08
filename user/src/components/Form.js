@@ -1,5 +1,5 @@
 import React from 'react';
-import { withForm, Form, Field } from 'formik';
+import { withFormik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import Axios from 'axios';
 
@@ -8,7 +8,7 @@ const LoginForm = ({ touched, errors }) => {
         <div className='login-form'>
             <Form>
                 <div>
-                    {/* {touched.name && errors.name && <p>{errors.name}</p>} */}
+                    {touched.name && errors.name && <p>{errors.name}</p>}
                     <Field
                         type='text'
                         name='name'
@@ -17,6 +17,7 @@ const LoginForm = ({ touched, errors }) => {
                 </div>
                 
                 <div>
+                    {touched.email && errors.email && <p>{errors.email}</p>}
                     <Field
                         type='email'
                         name='email'
@@ -26,6 +27,7 @@ const LoginForm = ({ touched, errors }) => {
                 </div>
                 
                 <div>
+                    {touched.password && errors.password && <p>{errors.password}</p>}
                     <Field
                         type='password'
                         name='password'
@@ -37,15 +39,42 @@ const LoginForm = ({ touched, errors }) => {
                 <div>
                     <Field
                         type='checkbox'
-                        name='terms'>
-                            <p>Agree to the <strong>terms</strong></p>
-                    </Field>
+                        name='terms'
+                        // check={values.terms}
+                     />
+                    <p>Agree to the terms</p>
                 </div>
-            </Form>
 
-            <button type='submit'>Submit</button>
+                <button type='submit'>Submit</button>
+            </Form>
         </div>
     )
 }
 
-export default LoginForm;
+const FormikLoginForm = withFormik({
+    mapPropsToValues({ name, email, password, terms }) {
+        return {
+            name: name || '',
+            email: email | '',
+            password: password || '',
+            terms: terms || false,
+        }
+    },
+
+    validationSchema: Yup.object().shape({
+        name: Yup.string().required('Name is required'),
+        email: Yup.string().required('Email not valid')
+            .required('Email is required'),
+        password: Yup.string()
+            .min(6, 'Password must be 6 characters or longer')
+            .required('Password is required')
+        // terms: Yup.
+    }),
+
+    handleSubmit(values) {
+        console.log(values)
+    }
+
+})(LoginForm);
+
+export default FormikLoginForm;
