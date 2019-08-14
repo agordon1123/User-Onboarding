@@ -1,0 +1,12 @@
+.App {
+  text-align: center;
+}
+.error {
+  font-size: 10px;
+  color: red;
+}
+.terms {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
